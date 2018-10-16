@@ -1,6 +1,6 @@
 <?php
 
-    $dsn = "mysql:host=localhost;dbname=oneline_bbs";
+    $dsn = "mysql:host=localhost;dbname=oneline_bbs;charset=utf8";
     $user = 'root';
     $password = '';
     //データベースに接続
@@ -33,7 +33,7 @@
         //ひとことが正しく入力されているかチェック
         $comment = null;
 
-        if (!isset($_POST['name']) || !strlen($_POST['name'])) {
+        if (!isset($_POST['comment']) || !strlen($_POST['comment'])) {
             $errors['comment'] = 'ひとことを入力して下さい';
         } elseif (strlen($_POST['name'] > 200)) {
             $errors['comment'] = 'ひとことは200文字以内で入力して下さい';
@@ -43,9 +43,10 @@
 
         //エラーがなければ保存
         if (count($errors) === 0) {
-            TODO: SQLインジェクション対策のコードを書く
-            TODO: INSERT文のコードを書く
-            
+            $stmt = $dbh->prepare('INSERT INTO post (name, comment, created_at) VALUES(?, ?, ?)');
+            $stmt->execute(array($name, $comment, date('Y-m-d H:i:s')));
+
+
         }
     }
 
