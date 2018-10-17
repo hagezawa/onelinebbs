@@ -17,6 +17,10 @@
 
     $errors = array();
 
+    //TODO フォームから投稿→テーブルにデータ保存の処理が
+    //     出来たので、リファクタリングをする
+    //     その前に、ひとこと一覧の表示をする
+
     //POSTなら保存処理実行
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = null;
@@ -30,9 +34,9 @@
             $name = $_POST['name'];
         }
 
-        //ひとことが正しく入力されているかチェック
         $comment = null;
 
+        //ひとことが正しく入力されているかチェック
         if (!isset($_POST['comment']) || !strlen($_POST['comment'])) {
             $errors['comment'] = 'ひとことを入力して下さい';
         } elseif (strlen($_POST['name'] > 200)) {
@@ -45,10 +49,32 @@
         if (count($errors) === 0) {
             $stmt = $dbh->prepare('INSERT INTO post (name, comment, created_at) VALUES(?, ?, ?)');
             $stmt->execute(array($name, $comment, date('Y-m-d H:i:s')));
-
-
         }
-    }
 
-    $db = null;
+        //データ取得
+        $select = "SELECT * FROM post";
+        $rows = $dbh->query($select)->fetchALL();
+
+        $dbh = null;
+    }
 ?>
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>ひとこと一覧</title>
+</head>
+
+<body>
+    <ul>
+        <?php foreach($rows as $row): ?>
+            <?= $row['id'] . ' ' . $row['name'] . ' ' . $row['comment']; ?><br />
+        <?php endforeach;?>
+    </ul>
+
+    <form action="send.php">
+        <input type="submit" name="submit" value="送信" />
+    </form>
+</body>
+</html>
